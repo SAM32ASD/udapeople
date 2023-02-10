@@ -710,7 +710,6 @@ workflows:
           requires: [deploy-infrastructure]
       - run-migrations:
           requires:
-            - deploy-database
             - configure-infrastructure
       # - deploy-frontend:
       #     requires: [run-migrations]
