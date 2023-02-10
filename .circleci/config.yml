@@ -264,6 +264,7 @@ jobs:
             cd frontend
             npm install > /dev/null
             npm audit fix --audit-level=critical --force
+            npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
 
   scan-backend:
@@ -286,6 +287,7 @@ jobs:
             npm install > /dev/null
             npm update mkdirp --depth 6
             npm install --save-dev webpack@5.73.0
+            npm audit fix --audit-level=critical --force
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
       - slack/notify:
@@ -509,34 +511,34 @@ jobs:
       - revert-migrations:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
-  add-prometheus-node-exporter:
-    docker:
-      - image: python:3.10-alpine3.16
-    steps:
-      - checkout
-      - add_ssh_keys:
-          fingerprints:
-            - 'ab:52:25:68:df:4c:3a:d5:48:18:55:d8:f9:3b:df:de'
-      - run:
-          name: Install deps
-          command: |
-            apk add --update aws-cli tar gzip ansible nodejs npm
-      # - restore_cache:
-      #     keys: [backend-build]
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Setup Prometheus Node Exporter
-          command: |
-            cd .circleci/ansible
-            cat inventory.txt
-            ansible-playbook -i inventory.txt node-exporter.yml \
-            --key-file ~/.ssh/id_rsa_ab522568df4c3ad5481855d8f93bdfde -vvvv
-      # Here's where you will add some code to rollback on failure
-      - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
-      - revert-migrations:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+  # add-prometheus-node-exporter:
+  #   docker:
+  #     - image: python:3.10-alpine3.16
+  #   steps:
+  #     - checkout
+  #     - add_ssh_keys:
+  #         fingerprints:
+  #           - 'ab:52:25:68:df:4c:3a:d5:48:18:55:d8:f9:3b:df:de'
+  #     - run:
+  #         name: Install deps
+  #         command: |
+  #           apk add --update aws-cli tar gzip ansible nodejs npm
+  #     # - restore_cache:
+  #     #     keys: [backend-build]
+  #     - attach_workspace:
+  #         at: ~/
+  #     - run:
+  #         name: Setup Prometheus Node Exporter
+  #         command: |
+  #           cd .circleci/ansible
+  #           cat inventory.txt
+  #           ansible-playbook -i inventory.txt node-exporter.yml \
+  #           --key-file ~/.ssh/id_rsa_ab522568df4c3ad5481855d8f93bdfde -vvvv
+  #     # Here's where you will add some code to rollback on failure
+  #     - destroy-environment:
+  #         workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+  #     - revert-migrations:
+  #         workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
   smoke-test:
     docker:
@@ -664,25 +666,25 @@ jobs:
 workflows:
   default:
     jobs:
-      - get-aws-params:
-          filters:
-            branches:
-              only: [master, dev-branch]
-      - blue-frontend:
-          requires: [get-aws-params]
-          filters:
-            branches:
-              only: [master, dev-branch]
-      - deploy-database:
-          requires: [get-aws-params]
-          filters:
-            branches:
-              only: [master, dev-branch]
-      - deploy-prometheus-monitor:
-          requires: [get-aws-params]
-          filters:
-            branches:
-              only: [master, dev-branch]
+      # - get-aws-params:
+      #     filters:
+      #       branches:
+      #         only: [master]
+      # - blue-frontend:
+      #     requires: [get-aws-params]
+      #     filters:
+      #       branches:
+      #         only: [master, dev-branch]
+      # - deploy-database:
+      #     requires: [get-aws-params]
+      #     filters:
+      #       branches:
+      #         only: [master, dev-branch]
+      # - deploy-prometheus-monitor:
+      #     requires: [get-aws-params]
+      #     filters:
+      #       branches:
+      #         only: [master, dev-branch]
       - build-frontend:
           filters:
             branches:
